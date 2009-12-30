@@ -118,3 +118,33 @@ int SpriteKodoApp::OnExit()
 ////@end SpriteKodoApp cleanup
 }
 
+
+void SpriteKodoApp::OnInitCmdLine(wxCmdLineParser& parser)
+{
+    parser.SetDesc(g_cmdLineDesc);
+    parser.SetSwitchChars (wxT("-"));
+}
+ 
+bool SpriteKodoApp::OnCmdLineParsed(wxCmdLineParser& parser)
+{
+    bool silent_mode = parser.Found(wxT("s"));
+ 
+    // this is the input file list
+    wxArrayString files;
+    for (unsigned int i = 0; i < parser.GetParamCount(); i++)
+    {
+        files.Add(parser.GetParam(i));
+    }
+ 
+    // add to dropdown box if in GUI mode
+    if(!silent_mode)
+    {
+        
+    }
+ 
+    // and other command line parameters
+ 
+    // then do what you need with them.
+ 
+    return true;
+}

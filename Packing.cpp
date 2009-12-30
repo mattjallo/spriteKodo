@@ -46,7 +46,7 @@ RP_Node* RP_Node::Insert(CSourceImage* img)
             this->left_child->width = img->GetWidth();
             this->left_child->height = this->height;
             
-            this->right_child->left = this->left + img->GetWidth() + 1;
+            this->right_child->left = this->left + img->GetWidth();
             this->right_child->top = this->top;
             this->right_child->width = dw;
             this->right_child->height = this->height;
@@ -59,7 +59,7 @@ RP_Node* RP_Node::Insert(CSourceImage* img)
             this->left_child->height = img->GetHeight();
             
             this->right_child->left = this->left;
-            this->right_child->top = this->top + img->GetHeight() + 1;
+            this->right_child->top = this->top + img->GetHeight();
             this->right_child->width = this->width;
             this->right_child->height = dh;
         }

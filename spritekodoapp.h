@@ -1,14 +1,3 @@
-/////////////////////////////////////////////////////////////////////////////
-// Name:        spritekodoapp.h
-// Purpose:     
-// Author:      Matthew D. Jallo
-// Modified by: 
-// Created:     14/12/2009 09:39:21
-// RCS-ID:      
-// Copyright:   
-// Licence:     
-/////////////////////////////////////////////////////////////////////////////
-
 #ifndef _SPRITEKODOAPP_H_
 #define _SPRITEKODOAPP_H_
 
@@ -21,6 +10,8 @@
 #include "wx/image.h"
 #include "spritekodomainwnd.h"
 ////@end includes
+
+#include <wx/cmdline.h>
 
 /*!
  * Forward declarations
@@ -56,6 +47,10 @@ public:
 
     /// Called on exit
     virtual int OnExit();
+    
+    virtual void OnInitCmdLine(wxCmdLineParser& parser);
+    
+    virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
 ////@begin SpriteKodoApp event handler declarations
 
@@ -67,6 +62,16 @@ public:
 
 ////@begin SpriteKodoApp member variables
 ////@end SpriteKodoApp member variables
+};
+
+static const wxCmdLineEntryDesc g_cmdLineDesc [] =
+{
+     { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), wxT("displays help on the command line parameters"),
+          wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+     { wxCMD_LINE_SWITCH, wxT("s"), wxT("silent"), wxT("disables the GUI") },
+     
+ 
+     { wxCMD_LINE_NONE }
 };
 
 /*!
