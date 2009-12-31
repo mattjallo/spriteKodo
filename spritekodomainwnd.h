@@ -137,15 +137,8 @@ public:
    
     protected:
 
-    SourceImageList _sourceImageList;
-    wxBitmap* _bitmap;
-    wxString _css;
-
     void UpdateSourceImageList();
-    void GenerateBitmap();
     void GeneratePreview();
-    void GenerateCSS();
-    bool AddImageFile(wxString path);
 };
 
 #endif

@@ -336,18 +336,6 @@ void spriteKodoMainWnd::OnAddimagesClick( wxCommandEvent& event )
     UpdateSourceImageList();
 }
 
-bool spriteKodoMainWnd::AddImageFile(wxString path)
-{
-    CSourceImage image();
-    if(image.LoadImage(path))
-    {
-        _sourceImageList.Add(image);
-        return true;
-    }
-    else
-        return false;
-}
-
 void spriteKodoMainWnd::UpdateSourceImageList()
 {
     _sourceImages->DeleteAllItems();

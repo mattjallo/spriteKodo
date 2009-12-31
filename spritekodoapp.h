@@ -12,6 +12,7 @@
 ////@end includes
 
 #include <wx/cmdline.h>
+#include "CKodoUtil.h"
 
 /*!
  * Forward declarations
@@ -51,6 +52,8 @@ public:
     virtual void OnInitCmdLine(wxCmdLineParser& parser);
     
     virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
+    
+    static CKodoUtil kodoUtil;
 
 ////@begin SpriteKodoApp event handler declarations
 
@@ -69,7 +72,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
      { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), wxT("displays help on the command line parameters"),
           wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
      { wxCMD_LINE_SWITCH, wxT("s"), wxT("silent"), wxT("disables the GUI") },
-     
  
      { wxCMD_LINE_NONE }
 };
