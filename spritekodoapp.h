@@ -71,8 +71,20 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
 {
      { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), wxT("displays help on the command line parameters"),
           wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-     { wxCMD_LINE_SWITCH, wxT("s"), wxT("silent"), wxT("disables the GUI") },
- 
+     { wxCMD_LINE_SWITCH, wxT("s"), wxT("silent"), wxT("prevents the GUI from displaying") },
+     { wxCMD_LINE_SWITCH, wxT("t"), wxT("transparent"), wxT("use a transparent background if output type supports it") },
+     { wxCMD_LINE_OPTION, wxT("b"), wxT("backgroundcolor"), wxT("the default background color of the sprite, as HTML hex color code. Default is #FFFFFF"),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_OPTION, wxT("w"), wxT("maxwidth"), wxT("the maximum width of the sprite in pixels, default 4000"),
+          wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_OPTION, wxT("i"), wxT("imagetype"), wxT("the format of the output image [PNG|JPG|BMP|XPM], default PNG"),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_OPTION, wxT("f"), wxT("file"), wxT("the filename for the output sprite image.  Required for --silent mode."),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_OPTION, wxT("c"), wxT("cssfile"), wxT("the filename for the CSS file.  If not specified in --silent mode, the CSS will be output to stdout."),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_PARAM, wxT("m"), wxT("sources"), wxT("source image files"),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL },
      { wxCMD_LINE_NONE }
 };
 

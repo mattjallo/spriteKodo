@@ -83,12 +83,13 @@ void SpriteKodoApp::Init()
 
 bool SpriteKodoApp::OnInit()
 {    
-
-    wxImage::AddHandler(new wxBMPHandler);
 	wxImage::AddHandler(new wxXPMHandler);
 	wxImage::AddHandler(new wxPNGHandler);
 	wxImage::AddHandler(new wxJPEGHandler);
 	wxImage::AddHandler(new wxGIFHandler);
+    
+    if (!wxApp::OnInit())
+        return false;
 
 	spriteKodoMainWnd* mainWindow = new spriteKodoMainWnd( NULL );
 	mainWindow->Show(true);
@@ -126,12 +127,14 @@ bool SpriteKodoApp::OnCmdLineParsed(wxCmdLineParser& parser)
         files.Add(parser.GetParam(i));
     }
  
-    // add to dropdown box if in GUI mode
-    if(!silent_mode)
+    if(files.Count() > 0)
     {
-        
+        size_t fileCount = files.Count();
+        for(size_t i=0; i<fileCount; i++)
+        {
+            CKodoUtil::Instance()->AddImageFile(files[i]);
+        }
     }
- 
     // and other command line parameters
  
     // then do what you need with them.
