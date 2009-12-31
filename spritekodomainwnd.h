@@ -83,8 +83,6 @@ public:
     /// Creates the controls and sizers
     void CreateControls();
     
-    static spriteKodoMainWnd* Instance();
-
 ////@begin spriteKodoMainWnd event handler declarations
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADDIMAGES

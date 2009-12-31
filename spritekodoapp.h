@@ -53,7 +53,7 @@ public:
     
     virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
     
-    static CKodoUtil kodoUtil;
+    CKodoUtil kodoUtil;
 
 ////@begin SpriteKodoApp event handler declarations
 

@@ -83,25 +83,15 @@ void SpriteKodoApp::Init()
 
 bool SpriteKodoApp::OnInit()
 {    
-////@begin SpriteKodoApp initialisation
-	// Remove the comment markers above and below this block
-	// to make permanent changes to the code.
 
-#if wxUSE_XPM
+    wxImage::AddHandler(new wxBMPHandler);
 	wxImage::AddHandler(new wxXPMHandler);
-#endif
-#if wxUSE_LIBPNG
 	wxImage::AddHandler(new wxPNGHandler);
-#endif
-#if wxUSE_LIBJPEG
 	wxImage::AddHandler(new wxJPEGHandler);
-#endif
-#if wxUSE_GIF
 	wxImage::AddHandler(new wxGIFHandler);
-#endif
+
 	spriteKodoMainWnd* mainWindow = new spriteKodoMainWnd( NULL );
 	mainWindow->Show(true);
-////@end SpriteKodoApp initialisation
 
     return true;
 }

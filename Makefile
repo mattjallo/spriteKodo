@@ -70,7 +70,7 @@ RESPATH=--include-dir "$(WXWIN)/include" --include-dir "$(WXWIN)/contrib/include
 MACPACKAGEINFO=
 endif
 
-OBJECTS=$(OBJECTPATH)/CSourceImage.o $(OBJECTPATH)/Packing.o $(OBJECTPATH)/spritekodoapp.o $(OBJECTPATH)/spritekodomainwnd.o $(RESOURCEOBJECT)
+OBJECTS=$(OBJECTPATH)/CKodoUtil.o $(OBJECTPATH)/CSourceImage.o $(OBJECTPATH)/Packing.o $(OBJECTPATH)/spritekodoapp.o $(OBJECTPATH)/spritekodomainwnd.o $(RESOURCEOBJECT)
 
 all:	$(BUILDPATHS) $(MACPACKAGEINFO) $(OUTPUTPATH)/$(PROGRAM)
 
@@ -108,16 +108,19 @@ $(OUTPUTPATH)/$(PROGRAM).app/Contents/PkgInfo: $(OUTPUTPATH)/$(PROGRAM) $(INFOPL
 	ln -f $(OUTPUTPATH)/$(PROGRAM) $(OUTPUTPATH)/$(PROGRAM).app/Contents/MacOS/$(PROGRAM)
 	cp -f $(ICNSSOURCE) $(ICNSDEST)
 
+$(OBJECTPATH)/CKodoUtil.o:	CKodoUtil.cpp CKodoUtil.h CSourceImage.h Packing.h
+	$(CXX) -c -o $@ $(CPPFLAGS) CKodoUtil.cpp
+
 $(OBJECTPATH)/CSourceImage.o:	CSourceImage.cpp CSourceImage.h
 	$(CXX) -c -o $@ $(CPPFLAGS) CSourceImage.cpp
 
 $(OBJECTPATH)/Packing.o:	Packing.cpp Packing.h CSourceImage.h
 	$(CXX) -c -o $@ $(CPPFLAGS) Packing.cpp
 
-$(OBJECTPATH)/spritekodoapp.o:	spritekodoapp.cpp spritekodoapp.h spritekodomainwnd.h CSourceImage.h
+$(OBJECTPATH)/spritekodoapp.o:	spritekodoapp.cpp spritekodoapp.h spritekodomainwnd.h CSourceImage.h CKodoUtil.h
 	$(CXX) -c -o $@ $(CPPFLAGS) spritekodoapp.cpp
 
-$(OBJECTPATH)/spritekodomainwnd.o:	spritekodomainwnd.cpp spritekodomainwnd.h CSourceImage.h Packing.h
+$(OBJECTPATH)/spritekodomainwnd.o:	spritekodomainwnd.cpp spritekodomainwnd.h CSourceImage.h CKodoUtil.h
 	$(CXX) -c -o $@ $(CPPFLAGS) spritekodomainwnd.cpp
 
 .PHONY:	all clean

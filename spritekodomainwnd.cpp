@@ -15,9 +15,8 @@
 
 #include "spritekodomainwnd.h"
 #include "CSourceImage.h"
-#include "Packing.h"
 #include <wx/colordlg.h>
-#include <wx/file.h>
+#include "CKodoUtil.h"
 
 ////@begin XPM images
 ////@end XPM images
@@ -321,34 +320,29 @@ wxIcon spriteKodoMainWnd::GetIconResource( const wxString& name )
 void spriteKodoMainWnd::OnAddimagesClick( wxCommandEvent& event )
 {
     wxArrayString paths = wxArrayString();
-    wxFileDialog* fdSourceImages = new wxFileDialog(this, _("Choose source images to add"), _(""), _(""), _("Images (bmp, gif, jpg, png)|*.bmp;*.gif;*.jpg;*.jpeg;*.png"), wxFD_MULTIPLE | wxFD_OPEN, wxDefaultPosition);
-    if(fdSourceImages->ShowModal() == wxID_OK)
+    wxFileDialog fdSourceImages(this, _("Choose source images to add"), _(""), _(""), _("Images (bmp, gif, jpg, png)|*.bmp;*.gif;*.jpg;*.jpeg;*.png"), wxFD_MULTIPLE | wxFD_OPEN, wxDefaultPosition);
+    if(fdSourceImages.ShowModal() == wxID_OK)
     {
-        fdSourceImages->GetPaths(paths);
+        fdSourceImages.GetPaths(paths);
         size_t fileCount = paths.GetCount();
         for(size_t i=0; i<fileCount; i++)
         {
-            AddImageFile(paths[i]);
+            CKodoUtil::Instance()->AddImageFile(paths[i]);
         }
     }
-    delete fdSourceImages;
-    _sourceImageList.Sort(CSourceImage::Compare);
+    CKodoUtil::Instance()->SortImagesByName();
     UpdateSourceImageList();
 }
 
 void spriteKodoMainWnd::UpdateSourceImageList()
 {
+    SourceImageList* _imageList = CKodoUtil::Instance()->GetSourceImageListReference();
     _sourceImages->DeleteAllItems();
-    size_t imageCount = _sourceImageList.GetCount();
+    size_t imageCount = _imageList->GetCount();
     for(size_t i = 0; i<imageCount; i++)
     {
-        _sourceImages->InsertItem((long)i, _sourceImageList[i].GetName()); 
+        _sourceImages->InsertItem((long)i, (*_imageList)[i].GetName()); 
     }
-}
-
-spriteKodoMainWnd* spriteKodoMainWnd::Instance()
-{
-    return NULL;
 }
 
 /*
@@ -360,67 +354,18 @@ void spriteKodoMainWnd::OnGenerateClick( wxCommandEvent& event )
     GeneratePreview();
 }
 
-void spriteKodoMainWnd::GenerateBitmap()
-{
-    _sourceImageList.Sort(CSourceImage::CompareArea);
-    
-    RP_Node node;
-    node.left = 0;
-    node.top = 0;
-    node.width = 2000;
-    node.height = 10000;
-    
-    size_t imageCount = _sourceImageList.GetCount();
-    for(size_t i=0; i<imageCount; i++)
-    {
-        CSourceImage* srcImage = &(_sourceImageList[i]);
-        node.Insert(srcImage);
-    }
-    
-    node.Unwind();
-    
-    int maxWidth = 0;
-    int maxHeight = 0;
-    
-    for(size_t i=0; i<imageCount; i++)
-    {
-        CSourceImage img = _sourceImageList[i];
-        if(img.GetLeft() + img.GetWidth() > maxWidth)
-            maxWidth = img.GetLeft() + img.GetWidth();
-        if(img.GetTop() + img.GetHeight() > maxHeight)
-            maxHeight = img.GetTop() + img.GetHeight();
-    }
-    
-    _bitmap = new wxBitmap(maxWidth, maxHeight);
-    
-    wxMemoryDC mdc;
-    mdc.SelectObject(*_bitmap);
-    
-    int bgStyle = (_cbTransparentBackground->IsChecked() ? wxTRANSPARENT : wxSOLID);
-    wxBrush bgBrush(_backgroundColor->GetBackgroundColour(), bgStyle);
-    mdc.SetBackground(bgBrush);
-    mdc.Clear();
-    
-    for(size_t i=0; i<imageCount; i++)
-    {
-        wxMemoryDC sourceDC;
-        wxBitmap sourceBitmap(*_sourceImageList[i].GetImage());
-        sourceDC.SelectObjectAsSource(sourceBitmap);
-        
-        mdc.Blit(_sourceImageList[i].GetLeft(), _sourceImageList[i].GetTop(), _sourceImageList[i].GetWidth(), _sourceImageList[i].GetHeight(), &sourceDC, 0, 0, wxCOPY, true);
-    }
-    
-    mdc.SelectObject(wxNullBitmap);
-    
-    _sourceImageList.Sort(CSourceImage::Compare);
-}
-
 void spriteKodoMainWnd::GeneratePreview()
 {
-    this->GenerateBitmap();
+    CKodoUtil::Instance()->SetBackgroundColor(_backgroundColor->GetBackgroundColour());
+    CKodoUtil::Instance()->SetTransparentBackground(_cbTransparentBackground->IsChecked());
+    CKodoUtil::Instance()->SetOutputType(_outputFormat->GetStringSelection());
     
-    int bmpWidth = _bitmap->GetWidth();
-    int bmpHeight = _bitmap->GetHeight();
+    CKodoUtil::Instance()->Generate();
+    
+    wxBitmap _bitmap = CKodoUtil::Instance()->GetBitmapPreview();
+    
+    int bmpWidth = _bitmap.GetWidth();
+    int bmpHeight = _bitmap.GetHeight();
     
     int previewWidth = bmpWidth;
     int previewHeight = bmpHeight;
@@ -441,12 +386,10 @@ void spriteKodoMainWnd::GeneratePreview()
         previewHeight = (int)(previewHeight * widthScale);
     }
     
-    wxImage image = _bitmap->ConvertToImage();
+    wxImage image = _bitmap.ConvertToImage();
     wxBitmap bmp(image.Scale(previewWidth, previewHeight));
     _staticPreview->SetBitmap(bmp); 
-    
-    this->GenerateCSS();
-    _cssPreview->SetValue(_css);
+    _cssPreview->SetValue(CKodoUtil::Instance()->GetCSSPreview());
 }
 
 /*
@@ -474,46 +417,8 @@ void spriteKodoMainWnd::OnColorchooseClick( wxCommandEvent& event )
 
 void spriteKodoMainWnd::OnSaveClick( wxCommandEvent& event )
 {
-    if(_bitmap == NULL)
-        GenerateBitmap();
-        
-    int type = 0;
-   
-    int cSel = _outputFormat->GetSelection();
-    if(cSel == 0)
-    {
-        type = wxBITMAP_TYPE_PNG;
-    }
-    if(cSel == 1)
-    {
-        type = wxBITMAP_TYPE_JPEG;
-    }
-    if(cSel == 2)
-    {
-        type = wxBITMAP_TYPE_BMP;
-    }
-    if(cSel == 3)
-    {
-        type = wxBITMAP_TYPE_XPM;
-    }
-    
-    wxImage image = _bitmap->ConvertToImage();
-    
     wxString filename = _spriteFilename->GetValue();
-    image.SaveFile(filename, type);
-}
-
-void spriteKodoMainWnd::GenerateCSS()
-{
-    wxString cssPrefix = _(".spr-");
-    
-    _css.Clear();
-    size_t imageCount = _sourceImageList.Count();
-    for(size_t i=0; i<imageCount; i++)
-    {
-        wxString cssClass = cssPrefix + _sourceImageList[i].GetName() + wxString::Format(_(" {\n  background-position: -%dpx -%dpx;\n  width: %dpx;\n  height: %dpx;\n}\n"), _sourceImageList[i].GetLeft(), _sourceImageList[i].GetTop(), _sourceImageList[i].GetWidth(), _sourceImageList[i].GetHeight());
-        _css.Append(cssClass);
-    }
+    CKodoUtil::Instance()->SaveBitmap(filename);
 }
 
 /*
@@ -522,15 +427,8 @@ void spriteKodoMainWnd::GenerateCSS()
 
 void spriteKodoMainWnd::OnCsssaveClick( wxCommandEvent& event )
 {
-    if(_bitmap == NULL)
-    {
-        GenerateBitmap();
-        GenerateCSS();
-    }
     wxString filename = _cssFilename->GetValue();
-    wxFile output(filename, wxFile::write);
-    output.Write(_css);
-    output.Close();
+    CKodoUtil::Instance()->SaveCSS(filename);
 }
 
 
