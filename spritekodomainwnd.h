@@ -11,6 +11,7 @@
 #include "wx/notebook.h"
 #include "wx/listctrl.h"
 #include "wx/statline.h"
+#include "wx/hyperlink.h"
 ////@end includes
 
 #include "CSourceImage.h"
@@ -47,6 +48,7 @@ class wxListCtrl;
 #define ID_CSSFILENAME 10016
 #define ID_BROWSECSS 10017
 #define ID_CSSSAVE 10018
+#define ID_HYPERLINKCTRL 10023
 #define ID_NOTEBOOK 10015
 #define ID_PANEL 10019
 #define ID_PANEL1 10020

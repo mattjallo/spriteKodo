@@ -13,7 +13,7 @@ CONFIG=debug
 ifeq ($(CONFIG),debug)
 WXWIN=/opt/wxGTK-2.8.10
 TOOLCHAINNAME=gtk2ud
-WXVERSION:=$(shell echo `$(WXWIN)/GCCBuildDebugGTK2Unicode/wx-config --version`)
+WXVERSION:=$(shell echo `wx-config --version`)
 CXX=g++
 LINKER=g++
 CC=gcc
@@ -24,19 +24,19 @@ RESOURCEOBJECT=
 OUTPUTPATH=GCCDebug
 OBJECTPATH=GCCDebug
 BUILDPATHS=$(OBJECTPATH)
-PROGRAM=spriteKodo
-LIBS=$(shell $(WXWIN)/GCCBuildDebugGTK2Unicode/wx-config --inplace --exec-prefix="$(WXWIN)/GCCBuildDebugGTK2Unicode" --libs std --cxxflags)
+PROGRAM=spritekodo
+LIBS=$(shell wx-config --libs std --cxxflags)
 LINKERFLAGS=
 WARNINGFLAGS=-Wall -Wno-write-strings
 OPTFLAGS=-O0
 DEBUGFLAGS=-ggdb
 LIBPATH=
-CPPINC:=$(shell $(WXWIN)/GCCBuildDebugGTK2Unicode/wx-config --inplace --cxxflags)
+CPPINC:=$(shell wx-config --cxxflags)
 GCCFLAGS=
 LDFLAGS=$(LIBS) $(LIBPATH) $(LINKERFLAGS)
 CPPFLAGS=$(CPPINC) $(GCCFLAGS) $(DEBUGFLAGS) $(OPTFLAGS) $(WARNINGFLAGS)
-LIBDIRNAME=$(WXWIN)/GCCBuildDebugGTK2Unicode/lib
-RESPATH=--include-dir "$(WXWIN)/include" --include-dir "$(WXWIN)/contrib/include" --include-dir "$(WXWIN)/GCCBuildDebugGTK2Unicode/lib/wx/include/gtk2-unicode-debug-static-2.8"
+LIBDIRNAME=$(WXWIN)/GCCBuildDebugGTK2UnicodeDLL/lib
+RESPATH=--include-dir "$(WXWIN)/include" --include-dir "$(WXWIN)/contrib/include" --include-dir "$(WXWIN)/GCCBuildDebugGTK2UnicodeDLL/lib/wx/include/gtk2-unicode-debug-2.8"
 MACPACKAGEINFO=
 
 # release
@@ -54,7 +54,7 @@ RESOURCEOBJECT=
 OUTPUTPATH=GCCRelease
 OBJECTPATH=GCCRelease
 BUILDPATHS=$(OBJECTPATH)
-PROGRAM=spriteKodo
+PROGRAM=spritekodo
 LIBS=$(shell wx-config --libs std --cxxflags)
 LINKERFLAGS=
 WARNINGFLAGS=-Wall -Wno-write-strings
@@ -65,8 +65,8 @@ CPPINC:=$(shell wx-config --cxxflags)
 GCCFLAGS=
 LDFLAGS=$(LIBS) $(LIBPATH) $(LINKERFLAGS)
 CPPFLAGS=$(CPPINC) $(GCCFLAGS) $(DEBUGFLAGS) $(OPTFLAGS) $(WARNINGFLAGS)
-LIBDIRNAME=$(WXWIN)/GCCBuildReleaseGTK2Unicode/lib
-RESPATH=--include-dir "$(WXWIN)/include" --include-dir "$(WXWIN)/contrib/include" --include-dir "$(WXWIN)/GCCBuildReleaseGTK2Unicode/lib/wx/include/gtk2-unicode-release-static-2.8"
+LIBDIRNAME=$(WXWIN)/GCCBuildReleaseGTK2UnicodeDLL/lib
+RESPATH=--include-dir "$(WXWIN)/include" --include-dir "$(WXWIN)/contrib/include" --include-dir "$(WXWIN)/GCCBuildReleaseGTK2UnicodeDLL/lib/wx/include/gtk2-unicode-release-2.8"
 MACPACKAGEINFO=
 endif
 
@@ -120,7 +120,7 @@ $(OBJECTPATH)/Packing.o:	Packing.cpp Packing.h CSourceImage.h
 $(OBJECTPATH)/spritekodoapp.o:	spritekodoapp.cpp spritekodoapp.h spritekodomainwnd.h CSourceImage.h CKodoUtil.h
 	$(CXX) -c -o $@ $(CPPFLAGS) spritekodoapp.cpp
 
-$(OBJECTPATH)/spritekodomainwnd.o:	spritekodomainwnd.cpp spritekodomainwnd.h CSourceImage.h CKodoUtil.h
+$(OBJECTPATH)/spritekodomainwnd.o:	spritekodomainwnd.cpp spritekodomainwnd.h CSourceImage.h CKodoUtil.h goat.inc
 	$(CXX) -c -o $@ $(CPPFLAGS) spritekodomainwnd.cpp
 
 .PHONY:	all clean
