@@ -10,6 +10,7 @@
 #endif
 
 ////@begin includes
+#include "wx/mstream.h"
 #include "wx/imaglist.h"
 ////@end includes
 
@@ -17,6 +18,8 @@
 #include "CSourceImage.h"
 #include <wx/colordlg.h>
 #include "CKodoUtil.h"
+
+#include "goat.inc"
 
 ////@begin XPM images
 ////@end XPM images
@@ -37,6 +40,8 @@ BEGIN_EVENT_TABLE( spriteKodoMainWnd, wxFrame )
 
 ////@begin spriteKodoMainWnd event table entries
     EVT_BUTTON( ID_ADDIMAGES, spriteKodoMainWnd::OnAddimagesClick )
+
+    EVT_BUTTON( ID_REMOVEIMAGE, spriteKodoMainWnd::OnRemoveimageClick )
 
     EVT_BUTTON( ID_COLORCHOOSE, spriteKodoMainWnd::OnColorchooseClick )
 
@@ -81,7 +86,7 @@ bool spriteKodoMainWnd::Create( wxWindow* parent, wxWindowID id, const wxString&
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    SetIcon(GetIconResource(wxT("goat.ico")));
+    SetIcon(GetIconResource(wxT("goat.png")));
     Centre();
 ////@end spriteKodoMainWnd creation
 
@@ -91,6 +96,8 @@ bool spriteKodoMainWnd::Create( wxWindow* parent, wxWindowID id, const wxString&
     _outputFormat->Append(_("JPG"));
     _outputFormat->Append(_("BMP"));
     _outputFormat->Append(_("XPM"));
+
+    UpdateSourceImageList();
 
     return true;
 }
@@ -118,6 +125,7 @@ void spriteKodoMainWnd::Init()
     _cmdAddImages = NULL;
     _cbTransparentBackground = NULL;
     _backgroundColor = NULL;
+    _cssPrefix = NULL;
     _outputSizer = NULL;
     _outputFormat = NULL;
     _spriteFilename = NULL;
@@ -165,108 +173,124 @@ void spriteKodoMainWnd::CreateControls()
     itemNotebook4->AddPage(itemPanel5, _("Sources"));
 
     wxPanel* itemPanel11 = new wxPanel( itemNotebook4, ID_OPTIONSNB, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxStaticBox* itemStaticBoxSizer12Static = new wxStaticBox(itemPanel11, wxID_ANY, _("Background"));
+    wxStaticBox* itemStaticBoxSizer12Static = new wxStaticBox(itemPanel11, wxID_ANY, wxEmptyString);
     wxStaticBoxSizer* itemStaticBoxSizer12 = new wxStaticBoxSizer(itemStaticBoxSizer12Static, wxVERTICAL);
     itemPanel11->SetSizer(itemStaticBoxSizer12);
 
+    wxStaticBox* itemStaticBoxSizer13Static = new wxStaticBox(itemPanel11, wxID_ANY, _("Background"));
+    wxStaticBoxSizer* itemStaticBoxSizer13 = new wxStaticBoxSizer(itemStaticBoxSizer13Static, wxVERTICAL);
+    itemStaticBoxSizer12->Add(itemStaticBoxSizer13, 0, wxGROW|wxALL, 1);
     _cbTransparentBackground = new wxCheckBox( itemPanel11, ID_CHECKBOX, _("Transparent Background"), wxDefaultPosition, wxDefaultSize, 0 );
     _cbTransparentBackground->SetValue(false);
-    itemStaticBoxSizer12->Add(_cbTransparentBackground, 0, wxALIGN_LEFT|wxALL, 1);
+    itemStaticBoxSizer13->Add(_cbTransparentBackground, 0, wxALIGN_LEFT|wxALL, 1);
 
-    wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxHORIZONTAL);
-    itemStaticBoxSizer12->Add(itemBoxSizer14, 0, wxGROW|wxALL, 1);
-    wxButton* itemButton15 = new wxButton( itemPanel11, ID_COLORCHOOSE, _("Set Color"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer14->Add(itemButton15, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer13->Add(itemBoxSizer15, 0, wxGROW|wxALL, 1);
+    wxButton* itemButton16 = new wxButton( itemPanel11, ID_COLORCHOOSE, _("Set Color"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer15->Add(itemButton16, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    _backgroundColor = new wxStaticText( itemPanel11, wxID_STATIC, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+    _backgroundColor = new wxStaticText( itemPanel11, wxID_STATIC, _("SAMPLE"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE );
+    _backgroundColor->SetForegroundColour(wxColour(255, 255, 255));
     _backgroundColor->SetBackgroundColour(wxColour(255, 255, 255));
-    itemBoxSizer14->Add(_backgroundColor, 1, wxGROW|wxALL, 5);
+    _backgroundColor->SetFont(wxFont(14, wxSWISS, wxNORMAL, wxBOLD, false, wxT("Sans")));
+    itemBoxSizer15->Add(_backgroundColor, 1, wxGROW|wxALL, 5);
+
+    wxStaticBox* itemStaticBoxSizer18Static = new wxStaticBox(itemPanel11, wxID_ANY, _("CSS"));
+    wxStaticBoxSizer* itemStaticBoxSizer18 = new wxStaticBoxSizer(itemStaticBoxSizer18Static, wxVERTICAL);
+    itemStaticBoxSizer12->Add(itemStaticBoxSizer18, 0, wxGROW|wxALL, 1);
+    wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer18->Add(itemBoxSizer19, 0, wxGROW|wxALL, 1);
+    wxStaticText* itemStaticText20 = new wxStaticText( itemPanel11, wxID_STATIC, _("Class name prefix:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer19->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    _cssPrefix = new wxTextCtrl( itemPanel11, ID_TEXTCTRL, _(".spr-"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer19->Add(_cssPrefix, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
     itemNotebook4->AddPage(itemPanel11, _("Options"));
 
-    wxPanel* itemPanel17 = new wxPanel( itemNotebook4, ID_GENERATIONNB, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxStaticBox* itemStaticBoxSizer18Static = new wxStaticBox(itemPanel17, wxID_ANY, wxEmptyString);
-    wxStaticBoxSizer* itemStaticBoxSizer18 = new wxStaticBoxSizer(itemStaticBoxSizer18Static, wxVERTICAL);
-    itemPanel17->SetSizer(itemStaticBoxSizer18);
+    wxPanel* itemPanel22 = new wxPanel( itemNotebook4, ID_GENERATIONNB, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxStaticBox* itemStaticBoxSizer23Static = new wxStaticBox(itemPanel22, wxID_ANY, wxEmptyString);
+    wxStaticBoxSizer* itemStaticBoxSizer23 = new wxStaticBoxSizer(itemStaticBoxSizer23Static, wxVERTICAL);
+    itemPanel22->SetSizer(itemStaticBoxSizer23);
 
-    wxButton* itemButton19 = new wxButton( itemPanel17, ID_GENERATE, _("Generate"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticBoxSizer18->Add(itemButton19, 0, wxGROW|wxALL, 1);
+    wxButton* itemButton24 = new wxButton( itemPanel22, ID_GENERATE, _("Generate"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticBoxSizer23->Add(itemButton24, 0, wxGROW|wxALL, 1);
 
-    wxStaticLine* itemStaticLine20 = new wxStaticLine( itemPanel17, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    itemStaticBoxSizer18->Add(itemStaticLine20, 0, wxGROW|wxALL, 5);
+    wxStaticLine* itemStaticLine25 = new wxStaticLine( itemPanel22, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+    itemStaticBoxSizer23->Add(itemStaticLine25, 0, wxGROW|wxALL, 5);
 
-    _outputSizer = new wxStaticBox(itemPanel17, wxID_ANY, _("Sprite Output"));
-    wxStaticBoxSizer* itemStaticBoxSizer21 = new wxStaticBoxSizer(_outputSizer, wxVERTICAL);
-    itemStaticBoxSizer18->Add(itemStaticBoxSizer21, 0, wxGROW|wxALL, 1);
-    wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxHORIZONTAL);
-    itemStaticBoxSizer21->Add(itemBoxSizer22, 0, wxGROW|wxALL, 1);
-    wxStaticText* itemStaticText23 = new wxStaticText( itemPanel17, wxID_STATIC, _("Output Format:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer22->Add(itemStaticText23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    _outputSizer = new wxStaticBox(itemPanel22, wxID_ANY, _("Sprite Output"));
+    wxStaticBoxSizer* itemStaticBoxSizer26 = new wxStaticBoxSizer(_outputSizer, wxVERTICAL);
+    itemStaticBoxSizer23->Add(itemStaticBoxSizer26, 0, wxGROW|wxALL, 1);
+    wxBoxSizer* itemBoxSizer27 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer26->Add(itemBoxSizer27, 0, wxGROW|wxALL, 1);
+    wxStaticText* itemStaticText28 = new wxStaticText( itemPanel22, wxID_STATIC, _("Output Format:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer27->Add(itemStaticText28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxArrayString _outputFormatStrings;
-    _outputFormat = new wxChoice( itemPanel17, ID_OUTPUTFORMAT, wxDefaultPosition, wxDefaultSize, _outputFormatStrings, 0 );
-    itemBoxSizer22->Add(_outputFormat, 2, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    _outputFormat = new wxChoice( itemPanel22, ID_OUTPUTFORMAT, wxDefaultPosition, wxDefaultSize, _outputFormatStrings, 0 );
+    itemBoxSizer27->Add(_outputFormat, 2, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    wxStaticText* itemStaticText25 = new wxStaticText( itemPanel17, wxID_STATIC, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticBoxSizer21->Add(itemStaticText25, 0, wxALIGN_LEFT|wxALL, 1);
+    wxStaticText* itemStaticText30 = new wxStaticText( itemPanel22, wxID_STATIC, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticBoxSizer26->Add(itemStaticText30, 0, wxALIGN_LEFT|wxALL, 1);
 
-    wxBoxSizer* itemBoxSizer26 = new wxBoxSizer(wxHORIZONTAL);
-    itemStaticBoxSizer21->Add(itemBoxSizer26, 0, wxGROW|wxALL, 1);
-    _spriteFilename = new wxTextCtrl( itemPanel17, ID_SPRITEFN, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer26->Add(_spriteFilename, 4, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer31 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer26->Add(itemBoxSizer31, 0, wxGROW|wxALL, 1);
+    _spriteFilename = new wxTextCtrl( itemPanel22, ID_SPRITEFN, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer31->Add(_spriteFilename, 4, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    wxButton* itemButton28 = new wxButton( itemPanel17, ID_BROWSESPRITE, _("..."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer26->Add(itemButton28, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    wxButton* itemButton33 = new wxButton( itemPanel22, ID_BROWSESPRITE, _("..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer31->Add(itemButton33, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    wxButton* itemButton29 = new wxButton( itemPanel17, ID_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticBoxSizer21->Add(itemButton29, 0, wxGROW|wxALL, 1);
+    wxButton* itemButton34 = new wxButton( itemPanel22, ID_SAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticBoxSizer26->Add(itemButton34, 0, wxGROW|wxALL, 1);
 
-    wxStaticBox* itemStaticBoxSizer30Static = new wxStaticBox(itemPanel17, wxID_ANY, _("CSS Output"));
-    wxStaticBoxSizer* itemStaticBoxSizer30 = new wxStaticBoxSizer(itemStaticBoxSizer30Static, wxVERTICAL);
-    itemStaticBoxSizer18->Add(itemStaticBoxSizer30, 0, wxGROW|wxALL, 1);
-    wxStaticText* itemStaticText31 = new wxStaticText( itemPanel17, wxID_STATIC, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticBoxSizer30->Add(itemStaticText31, 0, wxALIGN_LEFT|wxALL, 1);
+    wxStaticBox* itemStaticBoxSizer35Static = new wxStaticBox(itemPanel22, wxID_ANY, _("CSS Output"));
+    wxStaticBoxSizer* itemStaticBoxSizer35 = new wxStaticBoxSizer(itemStaticBoxSizer35Static, wxVERTICAL);
+    itemStaticBoxSizer23->Add(itemStaticBoxSizer35, 0, wxGROW|wxALL, 1);
+    wxStaticText* itemStaticText36 = new wxStaticText( itemPanel22, wxID_STATIC, _("Filename:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticBoxSizer35->Add(itemStaticText36, 0, wxALIGN_LEFT|wxALL, 1);
 
-    wxBoxSizer* itemBoxSizer32 = new wxBoxSizer(wxHORIZONTAL);
-    itemStaticBoxSizer30->Add(itemBoxSizer32, 0, wxGROW|wxALL, 1);
-    _cssFilename = new wxTextCtrl( itemPanel17, ID_CSSFILENAME, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer32->Add(_cssFilename, 4, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer37 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer35->Add(itemBoxSizer37, 0, wxGROW|wxALL, 1);
+    _cssFilename = new wxTextCtrl( itemPanel22, ID_CSSFILENAME, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer37->Add(_cssFilename, 4, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    wxButton* itemButton34 = new wxButton( itemPanel17, ID_BROWSECSS, _("..."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer32->Add(itemButton34, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
+    wxButton* itemButton39 = new wxButton( itemPanel22, ID_BROWSECSS, _("..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer37->Add(itemButton39, 1, wxALIGN_CENTER_VERTICAL|wxALL, 1);
 
-    wxButton* itemButton35 = new wxButton( itemPanel17, ID_CSSSAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticBoxSizer30->Add(itemButton35, 0, wxGROW|wxALL, 1);
+    wxButton* itemButton40 = new wxButton( itemPanel22, ID_CSSSAVE, _("Save"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticBoxSizer35->Add(itemButton40, 0, wxGROW|wxALL, 1);
 
-    itemNotebook4->AddPage(itemPanel17, _("Generate"));
+    itemNotebook4->AddPage(itemPanel22, _("Generate"));
 
     itemStaticBoxSizer3->Add(itemNotebook4, 1, wxGROW|wxALL, 1);
 
-    wxStaticBox* itemStaticBoxSizer36Static = new wxStaticBox(itemFrame1, wxID_ANY, _("Preview"));
-    wxStaticBoxSizer* itemStaticBoxSizer36 = new wxStaticBoxSizer(itemStaticBoxSizer36Static, wxVERTICAL);
-    itemBoxSizer2->Add(itemStaticBoxSizer36, 3, wxGROW|wxALL, 1);
+    wxStaticBox* itemStaticBoxSizer41Static = new wxStaticBox(itemFrame1, wxID_ANY, _("Preview"));
+    wxStaticBoxSizer* itemStaticBoxSizer41 = new wxStaticBoxSizer(itemStaticBoxSizer41Static, wxVERTICAL);
+    itemBoxSizer2->Add(itemStaticBoxSizer41, 3, wxGROW|wxALL, 1);
 
-    wxNotebook* itemNotebook37 = new wxNotebook( itemFrame1, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxBK_DEFAULT );
+    wxNotebook* itemNotebook42 = new wxNotebook( itemFrame1, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxBK_DEFAULT );
 
-    wxPanel* itemPanel38 = new wxPanel( itemNotebook37, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer39 = new wxBoxSizer(wxVERTICAL);
-    itemPanel38->SetSizer(itemBoxSizer39);
+    wxPanel* itemPanel43 = new wxPanel( itemNotebook42, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer44 = new wxBoxSizer(wxVERTICAL);
+    itemPanel43->SetSizer(itemBoxSizer44);
 
-    _staticPreview = new wxStaticBitmap( itemPanel38, wxID_STATIC, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer39->Add(_staticPreview, 1, wxGROW|wxALL, 1);
+    _staticPreview = new wxStaticBitmap( itemPanel43, wxID_STATIC, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer44->Add(_staticPreview, 1, wxGROW|wxALL, 1);
 
-    itemNotebook37->AddPage(itemPanel38, _("Sprite"));
+    itemNotebook42->AddPage(itemPanel43, _("Sprite"));
 
-    wxPanel* itemPanel41 = new wxPanel( itemNotebook37, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer42 = new wxBoxSizer(wxVERTICAL);
-    itemPanel41->SetSizer(itemBoxSizer42);
+    wxPanel* itemPanel46 = new wxPanel( itemNotebook42, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer47 = new wxBoxSizer(wxVERTICAL);
+    itemPanel46->SetSizer(itemBoxSizer47);
 
-    _cssPreview = new wxTextCtrl( itemPanel41, ID_CSSPREVIEW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-    itemBoxSizer42->Add(_cssPreview, 1, wxGROW|wxALL, 1);
+    _cssPreview = new wxTextCtrl( itemPanel46, ID_CSSPREVIEW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+    itemBoxSizer47->Add(_cssPreview, 1, wxGROW|wxALL, 1);
 
-    itemNotebook37->AddPage(itemPanel41, _("CSS"));
+    itemNotebook42->AddPage(itemPanel46, _("CSS"));
 
-    itemStaticBoxSizer36->Add(itemNotebook37, 1, wxGROW|wxALL, 1);
+    itemStaticBoxSizer41->Add(itemNotebook42, 1, wxGROW|wxALL, 1);
 
 ////@end spriteKodoMainWnd content construction
 }
@@ -303,9 +327,12 @@ wxIcon spriteKodoMainWnd::GetIconResource( const wxString& name )
     // Icon retrieval
 ////@begin spriteKodoMainWnd icon retrieval
     wxUnusedVar(name);
-    if (name == _T("goat.ico"))
+    if (name == _T("goat.png"))
     {
-        wxIcon icon(_T("goat.ico"), wxBITMAP_TYPE_ICO);
+        wxMemoryInputStream memStream(goat_png, sizeof(goat_png));
+        wxBitmap bitmap(wxImage(memStream, wxBITMAP_TYPE_ANY, -1), -1);
+        wxIcon icon;
+        icon.CopyFromBitmap(bitmap);
         return icon;
     }
     return wxNullIcon;
@@ -343,6 +370,11 @@ void spriteKodoMainWnd::UpdateSourceImageList()
     {
         _sourceImages->InsertItem((long)i, (*_imageList)[i].GetName()); 
     }
+    _cbTransparentBackground->SetValue(CKodoUtil::Instance()->GetTransparentBackground());
+    _backgroundColor->SetBackgroundColour(CKodoUtil::Instance()->GetBackgroundColor());
+    _backgroundColor->SetForegroundColour(CKodoUtil::Instance()->GetBackgroundColor());
+    _outputFormat->SetStringSelection(CKodoUtil::Instance()->GetOutputType());
+    _cssPrefix->SetValue(CKodoUtil::Instance()->GetCssPrefix());
 }
 
 /*
@@ -359,6 +391,7 @@ void spriteKodoMainWnd::GeneratePreview()
     CKodoUtil::Instance()->SetBackgroundColor(_backgroundColor->GetBackgroundColour());
     CKodoUtil::Instance()->SetTransparentBackground(_cbTransparentBackground->IsChecked());
     CKodoUtil::Instance()->SetOutputType(_outputFormat->GetStringSelection());
+    CKodoUtil::Instance()->SetCssPrefix(_cssPrefix->GetValue());
     
     CKodoUtil::Instance()->Generate();
     
@@ -405,6 +438,7 @@ void spriteKodoMainWnd::OnColorchooseClick( wxCommandEvent& event )
     if(dialog.ShowModal()==wxID_OK)
     {
         _backgroundColor->SetBackgroundColour(dialog.GetColourData().GetColour());
+        _backgroundColor->SetForegroundColour(dialog.GetColourData().GetColour());
         _backgroundColor->Refresh();
         _backgroundColor->Update();
     }
@@ -478,3 +512,23 @@ void spriteKodoMainWnd::OnBrowsecssClick( wxCommandEvent& event )
         _cssFilename->SetValue(fdialog.GetPath());
     }
 }
+
+
+/*
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REMOVEIMAGE
+ */
+
+void spriteKodoMainWnd::OnRemoveimageClick( wxCommandEvent& event )
+{
+    SourceImageList* _imageList = CKodoUtil::Instance()->GetSourceImageListReference();
+    for(int index=0; index<_sourceImages->GetItemCount(); index++)
+    {
+        if(_sourceImages->GetItemState(index, wxLIST_STATE_SELECTED) > 0)
+        {
+            _imageList->RemoveAt((size_t)index, 1);
+            _sourceImages->DeleteItem(index);
+            index--;
+        }
+    }
+}
+

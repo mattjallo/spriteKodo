@@ -28,6 +28,7 @@
 ////@begin XPM images
 ////@end XPM images
 
+#include <wx/file.h>
 
 /*
  * Application instance implementation
@@ -135,9 +136,70 @@ bool SpriteKodoApp::OnCmdLineParsed(wxCmdLineParser& parser)
             CKodoUtil::Instance()->AddImageFile(files[i]);
         }
     }
-    // and other command line parameters
- 
-    // then do what you need with them.
- 
+
+    if(parser.Found(wxT("t")))
+        CKodoUtil::Instance()->SetTransparentBackground(true);
+    else
+        CKodoUtil::Instance()->SetTransparentBackground(!silent_mode);
+
+    wxColour backgroundColor(_("#FFFFFF"));
+    wxString colorString;
+    if(parser.Found(wxT("b"), &colorString)) 
+    {
+        if(!backgroundColor.Set(colorString))
+            CKodoUtil::WriteToStdErr(_("Error: could not parse background color string '") + colorString + _("'"));
+    }
+    CKodoUtil::Instance()->SetBackgroundColor(backgroundColor);
+
+    long maxWidth = 4000;
+    if(parser.Found(wxT("w"), &maxWidth))
+    {
+        if(maxWidth <= 0)
+            CKodoUtil::WriteToStdErr(_("Error: invalid maximum width specified."));
+    }
+    CKodoUtil::Instance()->SetMaxWidth((int)maxWidth);
+
+    wxString imageType;
+    if(parser.Found(wxT("i"), &imageType))
+    {
+        imageType = imageType.Upper();
+        if(imageType!=_("PNG") && imageType!=_("JPG") && imageType!=_("BMP") && imageType!=_("XPM"))
+        {
+            CKodoUtil::WriteToStdErr(_("Error: invalid output image format specified. Defaulting to PNG."));
+            imageType = _("PNG");
+        }
+    }
+    CKodoUtil::Instance()->SetOutputType(imageType);
+   
+    wxString cssPrefix;
+    cssPrefix = _(".spr-");
+    parser.Found(wxT("p"), &cssPrefix);
+    CKodoUtil::Instance()->SetCssPrefix(cssPrefix);
+    
+    if(silent_mode)
+    {
+        wxString spriteFileName;
+        if(parser.Found(wxT("f"), &spriteFileName))
+        {
+            //generate the sprite
+            CKodoUtil::Instance()->Generate();
+            CKodoUtil::Instance()->SaveBitmap(spriteFileName);
+            
+            wxString cssFileName;
+            if(parser.Found(wxT("c"), &cssFileName))
+                CKodoUtil::Instance()->SaveCSS(cssFileName);
+            else
+            {
+                wxFile outlog;
+                outlog.Attach(wxFile::fd_stdout);
+                outlog.Write(CKodoUtil::Instance()->GetCSSPreview());
+                outlog.Flush();
+            }
+        }
+        else
+            CKodoUtil::WriteToStdErr(_("Error: -f must be specified for silent mode."));
+        return false;
+    }
+
     return true;
 }

@@ -43,7 +43,7 @@ MACPACKAGEINFO=
 else
 WXWIN=/opt/wxGTK-2.8.10
 TOOLCHAINNAME=gtk2u
-WXVERSION:=$(shell echo `$(WXWIN)/GCCBuildReleaseGTK2Unicode/wx-config --version`)
+WXVERSION:=$(shell echo `wx-config --version`)
 CXX=g++
 LINKER=g++
 CC=gcc
@@ -55,13 +55,13 @@ OUTPUTPATH=GCCRelease
 OBJECTPATH=GCCRelease
 BUILDPATHS=$(OBJECTPATH)
 PROGRAM=spriteKodo
-LIBS=$(shell $(WXWIN)/GCCBuildReleaseGTK2Unicode/wx-config --inplace --exec-prefix="$(WXWIN)/GCCBuildReleaseGTK2Unicode" --libs std --cxxflags)
+LIBS=$(shell wx-config --libs std --cxxflags)
 LINKERFLAGS=
 WARNINGFLAGS=-Wall -Wno-write-strings
 OPTFLAGS=-O2
 DEBUGFLAGS=
 LIBPATH=
-CPPINC:=$(shell $(WXWIN)/GCCBuildReleaseGTK2Unicode/wx-config --inplace --cxxflags)
+CPPINC:=$(shell wx-config --cxxflags)
 GCCFLAGS=
 LDFLAGS=$(LIBS) $(LIBPATH) $(LINKERFLAGS)
 CPPFLAGS=$(CPPINC) $(GCCFLAGS) $(DEBUGFLAGS) $(OPTFLAGS) $(WARNINGFLAGS)

@@ -37,6 +37,7 @@ class wxListCtrl;
 #define ID_OPTIONSNB 10011
 #define ID_CHECKBOX 10005
 #define ID_COLORCHOOSE 10006
+#define ID_TEXTCTRL 10022
 #define ID_GENERATIONNB 10012
 #define ID_GENERATE 10004
 #define ID_OUTPUTFORMAT 10007
@@ -88,6 +89,9 @@ public:
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADDIMAGES
     void OnAddimagesClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REMOVEIMAGE
+    void OnRemoveimageClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_COLORCHOOSE
     void OnColorchooseClick( wxCommandEvent& event );
 
@@ -125,6 +129,7 @@ public:
     wxButton* _cmdAddImages;
     wxCheckBox* _cbTransparentBackground;
     wxStaticText* _backgroundColor;
+    wxTextCtrl* _cssPrefix;
     wxStaticBox* _outputSizer;
     wxChoice* _outputFormat;
     wxTextCtrl* _spriteFilename;

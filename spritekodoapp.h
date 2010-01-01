@@ -79,6 +79,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc [] =
           wxCMD_LINE_VAL_NUMBER, wxCMD_LINE_PARAM_OPTIONAL },
      { wxCMD_LINE_OPTION, wxT("i"), wxT("imagetype"), wxT("the format of the output image [PNG|JPG|BMP|XPM], default PNG"),
           wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+     { wxCMD_LINE_OPTION, wxT("p"), wxT("cssprefix"), wxT("the string to prefix to filename bases for the css class names, default '.spr-'"),
+          wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
      { wxCMD_LINE_OPTION, wxT("f"), wxT("file"), wxT("the filename for the output sprite image.  Required for --silent mode."),
           wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
      { wxCMD_LINE_OPTION, wxT("c"), wxT("cssfile"), wxT("the filename for the CSS file.  If not specified in --silent mode, the CSS will be output to stdout."),
