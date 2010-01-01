@@ -1,0 +1,82 @@
+.\" Process this file with
+.\" groff -man -Tascii spritekodo.1
+.\"
+.TH SPRITEKODO 1 "JANUARY 2010" Linux "User Manuals"
+.SH NAME
+spriteKodo \- Efficient CSS Sprite Generator
+.SH SYNOPSIS
+.B spritekodo [-h] [-s] [-t] [-b 
+.I background color
+.B ] [-w 
+.I max width
+.B ] [-i 
+.I 'image type'
+.B ] [-p 
+.I 'prefix'
+.B ] [-f 
+.I 'filename'
+.B ] [-c 
+.I 'filename'
+.B ] [
+.I images ...
+.B ]
+.SH DESCRIPTION
+.B spriteKodo
+spriteKodo assembles a single image out of multiple source images (sprites), 
+and generates accompanying CSS for easy reference HTML files. It uses rectangle
+layout optimization heuristics to minimize the size of the sprite.
+.SH OPTIONS
+.IP "-h, --help"
+Display usage help
+.IP "-s, --silent"
+Operate in command line mode.  If this isn't specified, a GUI is presented.
+.IP "-t, --transparent"
+Use a transparent background if output type supports it
+.IP "-b 'color', --backgroundcolor='color'"
+Sets the default background color of the output image.
+.I color
+is an HTML hex color code.  The default is #FFFFFF.
+.IP "-w width, --maxwidth=width"
+Sets the maximum width in pixels for the output image. 4000 pixels is the default
+(larger widths may not work on older versions of the Opera browser).
+.IP "-i 'type', --imagetype='type'"
+Specifies the format for the output image.
+.I type
+must be one of [
+.B PNG
+|
+.B JPG
+|
+.B BMP
+|
+.B XPM
+]
+.IP "-p 'prefix', --cssprefix='prefix'"
+Defines the prefix for the CSS class names that are generated.  A class is generated 
+for each source image, and takes the name of the base of the filename with this prefix.
+The default for 
+.I prefix
+is '.spr-'
+.IP "-f filename, --file=filename"
+Specifies the filename for the output image.  If the file exists, it will be overwritten.
+Please remember to include an extension as needed. This is required if
+.I -s, --silent
+is specified
+.IP "-c filename, --cssfile=filename"
+Specifies a filename to write the resultant CSS.  If this is not specified in
+.I -s, --silent
+mode, the CSS is output to stdout.
+.SH FILES
+.I n/a 
+.SH ENVIRONMENT
+.I n/a
+.SH DIAGNOSTICS
+spriteKodo will issue error messages or warnings on stderr.  Generally, spriteKodo will 
+continue execution if possible by falling back on default values, which are noted on
+stderr.
+.SH BUGS
+http://code.google.com/p/spritekodo/issues/list
+.SH AUTHOR
+Matthew D. Jallo <matt@mattjallo.com>
+.SH "SEE ALSO"
+http://computing.caperna.org/spriteKodo
