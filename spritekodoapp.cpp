@@ -21,6 +21,7 @@
 #endif
 
 ////@begin includes
+#include "wx/mstream.h"
 ////@end includes
 
 #include "spritekodoapp.h"

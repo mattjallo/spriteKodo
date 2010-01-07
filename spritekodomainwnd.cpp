@@ -130,6 +130,7 @@ void spriteKodoMainWnd::Init()
     _outputFormat = NULL;
     _spriteFilename = NULL;
     _cssFilename = NULL;
+    _previewSizer = NULL;
     _staticPreview = NULL;
     _cssPreview = NULL;
 ////@end spriteKodoMainWnd member initialisation
@@ -266,34 +267,31 @@ void spriteKodoMainWnd::CreateControls()
 
     itemStaticBoxSizer3->Add(itemNotebook4, 1, wxGROW|wxALL, 1);
 
-    wxHyperlinkCtrl* itemHyperlinkCtrl41 = new wxHyperlinkCtrl( itemFrame1, ID_HYPERLINKCTRL, _("spriteKodo - Efficient CSS Sprite Generator"), _T("http://computing.caperna.org/spriteKodo"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    itemStaticBoxSizer3->Add(itemHyperlinkCtrl41, 0, wxGROW|wxALL, 1);
+    wxStaticBox* itemStaticBoxSizer41Static = new wxStaticBox(itemFrame1, wxID_ANY, _("Preview"));
+    wxStaticBoxSizer* itemStaticBoxSizer41 = new wxStaticBoxSizer(itemStaticBoxSizer41Static, wxVERTICAL);
+    itemBoxSizer2->Add(itemStaticBoxSizer41, 3, wxGROW|wxALL, 1);
 
-    wxStaticBox* itemStaticBoxSizer42Static = new wxStaticBox(itemFrame1, wxID_ANY, _("Preview"));
-    wxStaticBoxSizer* itemStaticBoxSizer42 = new wxStaticBoxSizer(itemStaticBoxSizer42Static, wxVERTICAL);
-    itemBoxSizer2->Add(itemStaticBoxSizer42, 3, wxGROW|wxALL, 1);
+    wxNotebook* itemNotebook42 = new wxNotebook( itemFrame1, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxBK_DEFAULT );
 
-    wxNotebook* itemNotebook43 = new wxNotebook( itemFrame1, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxBK_DEFAULT );
+    wxPanel* itemPanel43 = new wxPanel( itemNotebook42, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    _previewSizer = new wxBoxSizer(wxVERTICAL);
+    itemPanel43->SetSizer(_previewSizer);
 
-    wxPanel* itemPanel44 = new wxPanel( itemNotebook43, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer45 = new wxBoxSizer(wxVERTICAL);
-    itemPanel44->SetSizer(itemBoxSizer45);
+    _staticPreview = new wxStaticBitmap( itemPanel43, wxID_STATIC, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
+    _previewSizer->Add(_staticPreview, 1, wxGROW|wxALL, 1);
 
-    _staticPreview = new wxStaticBitmap( itemPanel44, wxID_STATIC, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer45->Add(_staticPreview, 1, wxGROW|wxALL, 1);
+    itemNotebook42->AddPage(itemPanel43, _("Sprite"));
 
-    itemNotebook43->AddPage(itemPanel44, _("Sprite"));
+    wxPanel* itemPanel46 = new wxPanel( itemNotebook42, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer47 = new wxBoxSizer(wxVERTICAL);
+    itemPanel46->SetSizer(itemBoxSizer47);
 
-    wxPanel* itemPanel47 = new wxPanel( itemNotebook43, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer48 = new wxBoxSizer(wxVERTICAL);
-    itemPanel47->SetSizer(itemBoxSizer48);
+    _cssPreview = new wxTextCtrl( itemPanel46, ID_CSSPREVIEW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+    itemBoxSizer47->Add(_cssPreview, 1, wxGROW|wxALL, 1);
 
-    _cssPreview = new wxTextCtrl( itemPanel47, ID_CSSPREVIEW, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-    itemBoxSizer48->Add(_cssPreview, 1, wxGROW|wxALL, 1);
+    itemNotebook42->AddPage(itemPanel46, _("CSS"));
 
-    itemNotebook43->AddPage(itemPanel47, _("CSS"));
-
-    itemStaticBoxSizer42->Add(itemNotebook43, 1, wxGROW|wxALL, 1);
+    itemStaticBoxSizer41->Add(itemNotebook42, 1, wxGROW|wxALL, 1);
 
 ////@end spriteKodoMainWnd content construction
 }
@@ -406,7 +404,8 @@ void spriteKodoMainWnd::GeneratePreview()
     int previewWidth = bmpWidth;
     int previewHeight = bmpHeight;
     
-    wxSize previewSize = _staticPreview->GetClientSize();
+	_previewSizer->RecalcSizes();
+	wxSize previewSize = _previewSizer->GetSize();
     
     if(previewHeight > previewSize.GetHeight())
     {
@@ -424,7 +423,7 @@ void spriteKodoMainWnd::GeneratePreview()
     
     wxImage image = _bitmap.ConvertToImage();
     wxBitmap bmp(image.Scale(previewWidth, previewHeight));
-    _staticPreview->SetBitmap(bmp); 
+	_staticPreview->SetBitmap(bmp); 
     _cssPreview->SetValue(CKodoUtil::Instance()->GetCSSPreview());
 }
 
@@ -454,7 +453,8 @@ void spriteKodoMainWnd::OnColorchooseClick( wxCommandEvent& event )
 
 void spriteKodoMainWnd::OnSaveClick( wxCommandEvent& event )
 {
-    wxString filename = _spriteFilename->GetValue();
+	GeneratePreview();
+	wxString filename = _spriteFilename->GetValue();
     CKodoUtil::Instance()->SaveBitmap(filename);
 }
 
@@ -464,7 +464,8 @@ void spriteKodoMainWnd::OnSaveClick( wxCommandEvent& event )
 
 void spriteKodoMainWnd::OnCsssaveClick( wxCommandEvent& event )
 {
-    wxString filename = _cssFilename->GetValue();
+    GeneratePreview();
+	wxString filename = _cssFilename->GetValue();
     CKodoUtil::Instance()->SaveCSS(filename);
 }
 

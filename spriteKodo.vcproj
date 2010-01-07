@@ -22,7 +22,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /EHsc"
 				Optimization="0"
-				AdditionalIncludeDirectories="/opt/wxGTK-2.8.10/include,/opt/wxGTK-2.8.10/contrib/include,/opt/wxGTK-2.8.10/lib/vc_lib/mswud,"
+				AdditionalIncludeDirectories="e:\wxWidgets/include,e:\wxWidgets/contrib/include,e:\wxWidgets/lib/vc_lib/mswud,C:\Program Files\Microsoft SDKs\Windows\v6.0A\include,c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\include"
 				PreprocessorDefinitions="NOPCH,WIN32,__WXMSW__,_WINDOWS,__WXDEBUG__,_DEBUG,_UNICODE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -48,7 +48,7 @@
 				OutputFile="VCProjectDebug\spriteKodo.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="/opt/wxGTK-2.8.10/lib/vc_lib,"
+				AdditionalLibraryDirectories="e:\wxWidgets/lib/vc_lib,C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib,c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="VCProjectDebug\spriteKodo.pdb"
 				SubSystem="2"/>
@@ -86,7 +86,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NOPCH,WIN32,__WXMSW__,_WINDOWS,__WXDEBUG__,_DEBUG,_UNICODE"
 				Culture="1033"
-				AdditionalIncludeDirectories="/opt/wxGTK-2.8.10/include;/opt/wxGTK-2.8.10/contrib/include;/opt/wxGTK-2.8.10/lib/vc_lib/mswud;"/>
+				AdditionalIncludeDirectories="e:\wxWidgets/include;e:\wxWidgets/contrib/include;e:\wxWidgets/lib/vc_lib/mswud;C:\Program Files\Microsoft SDKs\Windows\v6.0A\include;c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
@@ -104,7 +104,7 @@
 				AdditionalOptions=" /EHsc"
 				Optimization="1"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="/opt/wxGTK-2.8.10/include,/opt/wxGTK-2.8.10/contrib/include,/opt/wxGTK-2.8.10/lib/vc_lib/mswu,"
+				AdditionalIncludeDirectories="e:\wxWidgets/include,e:\wxWidgets/contrib/include,e:\wxWidgets/lib/vc_lib/mswu,C:\Program Files\Microsoft SDKs\Windows\v6.0A\include,c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\include"
 				PreprocessorDefinitions="NOPCH,WIN32,__WXMSW__,_WINDOWS,_UNICODE"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -130,7 +130,7 @@
 				OutputFile="VCProjectRelease\spriteKodo.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="/opt/wxGTK-2.8.10/lib/vc_lib,"
+				AdditionalLibraryDirectories="e:\wxWidgets/lib/vc_lib,C:\Program Files\Microsoft SDKs\Windows\v6.0A\lib,c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\lib"
 				ProgramDatabaseFile="VCProjectRelease\spriteKodo.pdb"
 				SubSystem="2"/>
 			<Tool
@@ -167,7 +167,7 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NOPCH,WIN32,__WXMSW__,_WINDOWS,_UNICODE"
 				Culture="1033"
-				AdditionalIncludeDirectories="/opt/wxGTK-2.8.10/include;/opt/wxGTK-2.8.10/contrib/include;/opt/wxGTK-2.8.10/lib/vc_lib/mswu;"/>
+				AdditionalIncludeDirectories="e:\wxWidgets/include;e:\wxWidgets/contrib/include;e:\wxWidgets/lib/vc_lib/mswu;C:\Program Files\Microsoft SDKs\Windows\v6.0A\include;c:\Program Files (x86)\Microsoft Visual Studio 9.0\vc\include"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
